@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <title>Bootstrap 5 Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row mt-3">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <input type="hidden" th:text="${articleDTO.no}" readonly>
+                    <h2>[[${articleDTO.title}]]</h2>
+                </div>
+                <div class="card-body p-3">
+                    <div class="mt-3 mb-3">
+                        내용 : <br>
+                        [[${articleDTO.content}]]
+                    </div>
+                    <div class="mb-3">
+                        조회수 : [[${articleDTO.viewcnt}]]
+                    </div>
+                    <div class="mb-3">
+                        등록 일자 : [[${#temporals.format(articleDTO.createDate, 'yyyy/MM/dd')}]]
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary" th:onclick="|location.href='@{/article/list}'|">목록</button>
+                    <button type="button" class="btn btn-secondary" th:onclick="|location.href='@{/article/modify(no=${articleDTO.no})}'|">수정</button>
+                    <button type="button" class="btn btn-danger" th:onclick="|location.href='@{/article/delete(no=${articleDTO.no})}'|">삭제</button>
+                    <div class="card my-4">
+                        <h5 class="card-header">댓글을 남겨주세요 : </h5>
+                        <div class="card-body">
+                            <form th:action="@{/article/{no}/comment(no=${articleDTO.no})}" th:method="post">
+                                <div class="form-group" style="margin-bottom: 10px">
+                                    <label class="form-label" for="content">내용 : </label>
+                                    <textarea id="content" name="content" class="form-control" rows="3"></textarea>
+                                    <label class="form-label" for="writer">작성자 : </label>
+                                    <input id="writer" type="text" name="writer" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary">저장</button>
+                                <button type="reset" class="btn btn-secondary">다시 작성</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card my-4" th:if="${commentDTOS.size()}!=0">
+                        <h5 class="card-header">댓글 : </h5>
+                        <div class="card-body">
+                            <div th:each="comment : ${commentDTOS}">
+                                <input type="hidden" th:value="${articleDTO.no}">
+                                <input type="hidden" th:value="${comment.no}">
+                                <h5 class="mt-0">작성자 : [[${comment.writer}]]</h5>
+                                <p>내용 : [[${comment.content}]]</p>
+                                <small class="text-muted">[[${#temporals.format(articleDTO.createDate, 'yyyy/MM/dd')}]]</small>
+                                <button type="button" class="btn btn-danger" th:onclick="|location.href='@{/article/{no}/comment/{commentNo}/delete(no=${articleDTO.no}, commentNo=${comment.no})}'|">삭제</button>
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" th:data-bs-target="'#modifyComment'+${comment.no}">수정</button>
+                                <div th:id="'modifyComment'+${comment.no}" class="collapse">
+                                    <form th:action="@{/article/{no}/comment/{commentNo}/modify(no=${articleDTO.no}, commentNo=${comment.no})}" th:method="post">
+                                        <div class="form-group" style="margin-bottom: 10px">
+                                            <input type="hidden" name="no" th:value="${articleDTO.no}" readonly>
+                                            <input type="hidden" name="commentNo" th:value="${comment.no}"/>
+                                            <input type="hidden" name="writer" th:value="${comment.writer}"/>
+                                            <textarea name="content" class="form-control" rows="3">[[${comment.content}]]</textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">저장</button>
+                                        <button type="reset" class="btn btn-secondary">취소</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4"></div>
+    </div>
+</div>
+</body>
+</html>

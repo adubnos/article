@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout.html}">
+<head>
+    <title>Bootstrap 5 Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mt-3">
+        <h2>게시글 목록</h2>
+        <button type="button" class="btn btn-primary" onclick="location.href='/article/register'">게시글 추가</button>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>No.</th>
+                <th>Title</th>
+                <th>ViewCnt</th>
+                <th>createD.</th>
+                <th>modifyD.</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="data:${list}">
+                <td>[[${data.no}]]</td>
+                <td><a th:href="@{/article/{no}(no=${data.no})}" th:text="${data.title}"></a></td>
+                <td>[[${data.viewcnt}]]</td>
+                <td>[[${#temporals.format(data.createDate, 'yyyy/MM/dd')}]]</td>
+                <td>[[${#temporals.format(data.modifyDate, 'yyyy/MM/dd')}]]</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="container mt-3">
+            <ul class="pagination mt-3">
+                <li class="page-item"><a class="page-link" th:href="@{/article/list(page=1)}"><<</a></li>
+                <li class="page-item"><a class="page-link" th:href="${list.first} ? '#' : @{/article/list(page=${list.number})}"><</a></li>
+                <span th:each="page:${#numbers.sequence(startPage, endPage)}">
+                        <li class="page-item active" th:if="${page == list.number+1}">
+                            <a class="page-link" href="#">[[${page}]]</a>
+                        </li>
+                        <li class="page-item" th:unless="${page == list.number+1}">
+                            <a class="page-link" th:href="@{/article/list(page=${page})}">[[${page}]]</a>
+                        </li>
+                    </span>
+                <li class="page-item"><a class="page-link" th:href="${list.last} ? '#' : @{/article/list(page=${list.number+2})}">></a></li>
+                <li class="page-item"><a class="page-link" th:href="@{/article/list(page=${list.totalPages})}">>></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>
